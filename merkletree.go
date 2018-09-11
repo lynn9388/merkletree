@@ -119,7 +119,6 @@ func (mn *MerkleNode) findNode(hash string) *MerkleNode {
 	if node == nil && mn.Left != nil {
 		node = mn.Left.findNode(hash)
 	}
-
 	if node == nil && mn.Right != nil {
 		node = mn.Right.findNode(hash)
 	}
@@ -189,6 +188,6 @@ func (mt *MerkleTree) prettyString() string {
 			children = children[:0]
 		}
 	}
-	return buf.String()
 
+	return buf.String()
 }
