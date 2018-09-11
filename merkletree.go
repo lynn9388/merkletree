@@ -32,9 +32,10 @@ type Data interface {
 // MerkleNode is a node in the tree. It stores pointers to its immediate
 // relationships and a hash.
 type MerkleNode struct {
-	Left  *MerkleNode
-	Right *MerkleNode
-	Hash  string
+	Parent *MerkleNode
+	Left   *MerkleNode
+	Right  *MerkleNode
+	Hash   string
 }
 
 // MerkleTree is the container for the tree. It stores a pointer to the
@@ -43,17 +44,31 @@ type MerkleTree struct {
 	Root *MerkleNode
 }
 
+// getHash returns the hash value in hexadecimal of the data.
+func getHash(data []byte) string {
+	hash := sha256.Sum256(data)
+	return hex.EncodeToString(hash[:])
+}
+
 // newMerkleNode creates a new node.
 func newMerkleNode(left *MerkleNode, right *MerkleNode, data []byte) *MerkleNode {
-	var hash [32]byte
+	var hash string
 
 	if left == nil && right == nil {
-		hash = sha256.Sum256(data)
+		hash = getHash(data)
 	} else {
-		hash = sha256.Sum256([]byte(left.Hash + right.Hash))
+		hash = getHash([]byte(left.Hash + right.Hash))
 	}
 
-	return &MerkleNode{Left: left, Right: right, Hash: hex.EncodeToString(hash[:])}
+	node := MerkleNode{Left: left, Right: right, Hash: hash}
+	if left != nil {
+		left.Parent = &node
+	}
+	if right != nil {
+		right.Parent = &node
+	}
+
+	return &node
 }
 
 // NewMerkleTree builds a new Merkle tree using the data.
@@ -67,13 +82,13 @@ func NewMerkleTree(data []Data) *MerkleTree {
 	for len(nodes) != 1 {
 		var parents []*MerkleNode
 
-		if len(nodes)%2 != 0 {
-			nodes = append(nodes, nodes[len(nodes)-1])
-		}
-
 		for i := 0; i <= len(nodes)/2; i += 2 {
 			node := newMerkleNode(nodes[i], nodes[i+1], []byte(nodes[i].Hash+nodes[i+1].Hash))
 			parents = append(parents, node)
+		}
+
+		if len(nodes)%2 != 0 {
+			parents = append(parents, nodes[len(nodes)-1])
 		}
 
 		nodes = parents
