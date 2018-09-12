@@ -20,13 +20,7 @@ import (
 	"testing"
 )
 
-var tests = []Data{testData("lynn"), testData("9388"), testData("lynn9388")}
-
-type testData string
-
-func (t testData) ToByte() []byte {
-	return []byte(t)
-}
+var tests = []Data{StringData("lynn"), StringData("9388"), StringData("lynn9388")}
 
 func TestNewMerkleTree(t *testing.T) {
 	mt := NewMerkleTree(tests...)

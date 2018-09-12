@@ -25,11 +25,6 @@ import (
 	"errors"
 )
 
-// Data is arbitrary content stored in Merkle tree
-type Data interface {
-	ToByte() []byte
-}
-
 // MerkleNode is a node in the tree. It stores pointers to its immediate
 // relationships and a hash.
 type MerkleNode struct {
