@@ -21,20 +21,10 @@ import "github.com/lynn9388/merkletree"
 
 ## Example
 
-1. Implement the `merkletree.Data`
+1. Create a new Merkle tree (The data type could be changed to any implementation of `Data`)
 
     ```go
-    type testData string
-
-    func (t testData) ToByte() []byte {
-        return []byte(t)
-    }
-    ```
-
-1. Create a new Merkle tree
-
-    ```go
-    tests := []Data{testData("lynn"), testData("9388"), testData("lynn9388")}
+    tests := []Data{StringData("lynn"), StringData("9388"), StringData("lynn9388")}
     mt := NewMerkleTree(tests...)
     ```
 
