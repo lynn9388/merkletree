@@ -26,29 +26,25 @@ import "github.com/lynn9388/merkletree"
     ```go
     tests := [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388"), []byte("com")}
     mt := NewMerkleTree(tests...)
-    fmt.Print(mt.PrettyString(5, 2))
+    fmt.Print(mt.PrettyString(5, 1))
     ```
 
     Output:
 
     ```text
-                 fda22
-                   /\
-                  /  \
-                 /    \
-              fdc64  71b4f
-                /\
-               /  \
-              /    \
-             /      \
-            /        \
-           /          \
-          /            \
-       eea86         a02c4
-         /\            /\
-        /  \          /  \
-       /    \        /    \
-    e0603  7c2ec  1502f  6d86b
+                fda22
+                 / \
+                /   \
+             fdc64 71b4f
+              / \
+             /   \
+            /     \
+           /       \
+          /         \
+       eea86       a02c4
+        / \         / \
+       /   \       /   \
+    e0603 7c2ec 1502f 6d86b
     ```
 
 2. Verify the hash of data is in the Merkle tree with [GetProof](https://godoc.org/github.com/lynn9388/merkletree#MerkleTree.GetProof) and [VerifyProof](https://godoc.org/github.com/lynn9388/merkletree#VerifyProof):
