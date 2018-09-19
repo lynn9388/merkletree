@@ -25,6 +25,11 @@ import (
 	"errors"
 )
 
+const (
+	left = iota
+	right
+)
+
 // MerkleNode is a node in the tree. It stores pointers to its immediate
 // relationships and a hash.
 type MerkleNode struct {
@@ -40,34 +45,29 @@ type MerkleTree struct {
 	Root *MerkleNode
 }
 
-const (
-	left = iota
-	right
-)
-
 // Proof is a item in data's proof path.
 type Proof struct {
 	hash  string
 	order int
 }
 
-// getHash returns the hash value in hexadecimal of the data.
-func getHash(data []byte) string {
+// hash returns the hash value in hexadecimal of the data.
+func hash(data []byte) string {
 	hash := sha256.Sum256(data)
 	return hex.EncodeToString(hash[:])
 }
 
 // newMerkleNode creates a new node.
 func newMerkleNode(left *MerkleNode, right *MerkleNode, data []byte) *MerkleNode {
-	var hash string
+	var h string
 
 	if left == nil && right == nil {
-		hash = getHash(data)
+		h = hash(data)
 	} else {
-		hash = getHash([]byte(left.Hash + right.Hash))
+		h = hash([]byte(left.Hash + right.Hash))
 	}
 
-	node := MerkleNode{Left: left, Right: right, Hash: hash}
+	node := MerkleNode{Left: left, Right: right, Hash: h}
 	if left != nil {
 		left.Parent = &node
 	}
@@ -89,7 +89,7 @@ func NewMerkleTree(data ...Data) *MerkleTree {
 	for len(nodes) != 1 {
 		var parents []*MerkleNode
 
-		for i := 0; i <= len(nodes)/2; i += 2 {
+		for i := 0; i+1 < len(nodes); i += 2 {
 			node := newMerkleNode(nodes[i], nodes[i+1], []byte(nodes[i].Hash+nodes[i+1].Hash))
 			parents = append(parents, node)
 		}
@@ -106,28 +106,29 @@ func NewMerkleTree(data ...Data) *MerkleTree {
 
 // findNode finds the leaf node with the same hash value.
 func (mn *MerkleNode) findNode(hash string) *MerkleNode {
-	var node *MerkleNode
-	if mn.Left == nil && mn.Right == nil && mn.Hash == hash {
-		node = mn
+	if mn == nil {
+		return nil
 	}
 
-	if node == nil && mn.Left != nil {
-		node = mn.Left.findNode(hash)
+	if mn.Left == nil && mn.Right == nil && mn.Hash == hash {
+		return mn
 	}
-	if node == nil && mn.Right != nil {
+
+	node := mn.Left.findNode(hash)
+	if node == nil {
 		node = mn.Right.findNode(hash)
 	}
-
 	return node
 }
 
-// GetVerifyProof returns a proof list, which is the verify path.
-func (mt *MerkleTree) GetVerifyProof(data Data) ([]Proof, error) {
+// GetProof returns a proof list for the data. The proof list is a verify
+// path which proofs the hash value of the data belongs to a leaf node.
+func (mt *MerkleTree) GetProof(data Data) ([]Proof, error) {
 	var ps []Proof
 
-	node := mt.Root.findNode(getHash(data.ToByte()))
+	node := mt.Root.findNode(hash(data.ToByte()))
 	if node == nil {
-		return nil, errors.New("no node with the same hash value")
+		return nil, errors.New("failed to find leaf node")
 	}
 
 	for node.Hash != mt.Root.Hash {
@@ -145,17 +146,17 @@ func (mt *MerkleTree) GetVerifyProof(data Data) ([]Proof, error) {
 
 // VerifyProof verifies if a proof is valid.
 func VerifyProof(data Data, ps []Proof, root string) bool {
-	hash := getHash(data.ToByte())
+	h := hash(data.ToByte())
 
 	for _, p := range ps {
 		if p.order == left {
-			hash = getHash([]byte(p.hash + hash))
+			h = hash([]byte(p.hash + h))
 		} else if p.order == right {
-			hash = getHash([]byte(hash + p.hash))
+			h = hash([]byte(h + p.hash))
 		}
 	}
 
-	return hash == root
+	return h == root
 }
 
 // prettyString returns a format string to present the Merkle tree.

@@ -24,7 +24,7 @@ type Data interface {
 // StringData is a wrapper of string.
 type StringData string
 
-// ToByte converts a string to byte slice.
+// ToByte converts a string to bytes.
 func (s StringData) ToByte() []byte {
 	return []byte(s)
 }

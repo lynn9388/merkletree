@@ -20,30 +20,30 @@ import (
 	"testing"
 )
 
-var tests = []Data{StringData("lynn"), StringData("9388"), StringData("lynn9388")}
+var tests = []Data{StringData("http"), StringData("wwww"), StringData("lynn"), StringData("9388"), StringData("com")}
 
 func TestNewMerkleTree(t *testing.T) {
 	mt := NewMerkleTree(tests...)
 	t.Log("\n" + mt.prettyString())
 }
 
-func TestMerkleTree_GetVerifyProof(t *testing.T) {
+func TestMerkleTree_GetProof(t *testing.T) {
 	mt := NewMerkleTree(tests[2])
-	proof, err := mt.GetVerifyProof(tests[0])
+	proof, err := mt.GetProof(tests[0])
 	if err == nil || proof != nil || VerifyProof(tests[0], proof, mt.Root.Hash) == true {
 		t.Error("failed in case 0")
 	}
-	proof, err = mt.GetVerifyProof(tests[2])
+	proof, err = mt.GetProof(tests[2])
 	if err != nil || proof != nil || VerifyProof(tests[2], proof, mt.Root.Hash) == false {
 		t.Error("failed in case 1")
 	}
 
 	mt = NewMerkleTree(tests...)
-	proof, err = mt.GetVerifyProof(tests[0])
+	proof, err = mt.GetProof(tests[0])
 	if err != nil || proof == nil || VerifyProof(tests[0], proof, mt.Root.Hash) == false {
 		t.Error("failed in case 2")
 	}
-	proof, err = mt.GetVerifyProof(tests[2])
+	proof, err = mt.GetProof(tests[2])
 	if err != nil || proof == nil || VerifyProof(tests[2], proof, mt.Root.Hash) == false {
 		t.Error("failed in case 3")
 	}
