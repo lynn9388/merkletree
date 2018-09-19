@@ -213,7 +213,7 @@ func (mt *MerkleTree) PrettyString(hashWidth int, leafGap int) string {
 		buff.WriteString("\n")
 
 		if level[0].Left != nil && level[0].Right != nil {
-			lineGap := spaces[i][0] - spaces[i+1][0] - 1
+			lineGap := spaces[i][0] - spaces[i+1][0]
 			nodeGap := (spaces[i+1][1] - spaces[i+1][0] - 2*lineGap) / 2
 			lines := make([]string, lineGap)
 			for i := 0; i < lineGap; i++ {
@@ -231,9 +231,9 @@ func (mt *MerkleTree) PrettyString(hashWidth int, leafGap int) string {
 			}
 
 			for _, line := range lines {
-				buff.WriteString(strings.Repeat(" ", spaces[i+1][0]+x/2+1) + line + "\n")
+				buff.WriteString(strings.Repeat(" ", spaces[i+1][0]+x/2+1) + strings.TrimRight(line, " ") + "\n")
 			}
 		}
 	}
-	return buff.String()
+	return strings.TrimRight(buff.String(), "\n")
 }
