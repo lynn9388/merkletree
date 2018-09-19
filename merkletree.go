@@ -80,11 +80,11 @@ func newMerkleNode(left *MerkleNode, right *MerkleNode, data []byte) *MerkleNode
 }
 
 // NewMerkleTree builds a new Merkle tree using the data.
-func NewMerkleTree(data ...Data) *MerkleTree {
+func NewMerkleTree(data ...[]byte) *MerkleTree {
 	var nodes []*MerkleNode
 
 	for _, datum := range data {
-		nodes = append(nodes, newMerkleNode(nil, nil, datum.ToByte()))
+		nodes = append(nodes, newMerkleNode(nil, nil, datum))
 	}
 
 	for len(nodes) != 1 {
@@ -124,10 +124,10 @@ func (mn *MerkleNode) findNode(hash string) *MerkleNode {
 
 // GetProof returns a proof list for the data. The proof list is a verify
 // path which proofs the hash value of the data belongs to a leaf node.
-func (mt *MerkleTree) GetProof(data Data) ([]Proof, error) {
+func (mt *MerkleTree) GetProof(data []byte) ([]Proof, error) {
 	var ps []Proof
 
-	node := mt.Root.findNode(hash(data.ToByte()))
+	node := mt.Root.findNode(hash(data))
 	if node == nil {
 		return nil, errors.New("failed to find leaf node")
 	}
@@ -146,8 +146,8 @@ func (mt *MerkleTree) GetProof(data Data) ([]Proof, error) {
 }
 
 // VerifyProof verifies if a proof is valid.
-func VerifyProof(data Data, ps []Proof, root string) bool {
-	h := hash(data.ToByte())
+func VerifyProof(data []byte, ps []Proof, root string) bool {
+	h := hash(data)
 
 	for _, p := range ps {
 		if p.order == left {

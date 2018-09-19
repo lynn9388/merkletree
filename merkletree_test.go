@@ -20,7 +20,7 @@ import (
 	"testing"
 )
 
-var tests = []Data{StringData("http"), StringData("wwww"), StringData("lynn"), StringData("9388"), StringData("com")}
+var tests = [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388"), []byte("com")}
 
 func TestNewMerkleTree(t *testing.T) {
 	mt := NewMerkleTree(tests...)
