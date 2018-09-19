@@ -24,7 +24,7 @@ var tests = []Data{StringData("http"), StringData("wwww"), StringData("lynn"), S
 
 func TestNewMerkleTree(t *testing.T) {
 	mt := NewMerkleTree(tests...)
-	t.Log("\n" + mt.prettyString())
+	t.Log("\n" + mt.PrettyString(7, 2))
 }
 
 func TestMerkleTree_GetProof(t *testing.T) {

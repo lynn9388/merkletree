@@ -23,6 +23,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"strings"
 )
 
 const (
@@ -159,31 +160,80 @@ func VerifyProof(data Data, ps []Proof, root string) bool {
 	return h == root
 }
 
-// prettyString returns a format string to present the Merkle tree.
-func (mt *MerkleTree) prettyString() string {
-	var buf bytes.Buffer
-	nodes := []*MerkleNode{mt.Root}
+// PrettyString returns a format string to present the Merkle tree.
+// hashWidth is the leading number of hash, leafGap is the gap between
+// leaves.
+func (mt *MerkleTree) PrettyString(hashWidth int, leafGap int) string {
+	nodes := [][]*MerkleNode{{mt.Root}}
 
-	var children []*MerkleNode
 	for i := 0; i < len(nodes); i++ {
-		n := nodes[i]
-
-		if n.Left != nil {
-			children = append(children, n.Left)
+		var ns []*MerkleNode
+		for j := 0; j < len(nodes[i]); j++ {
+			node := nodes[i][j]
+			if node.Left != nil {
+				ns = append(ns, node.Left)
+			}
+			if node.Right != nil {
+				ns = append(ns, node.Right)
+			}
 		}
-		if n.Right != nil {
-			children = append(children, n.Right)
-		}
-
-		buf.WriteString(n.Hash[:3] + "..." + n.Hash[len(n.Hash)-3:])
-		buf.WriteByte(' ')
-
-		if i == len(nodes)-1 {
-			buf.WriteByte('\n')
-			nodes = append(nodes, children...)
-			children = children[:0]
+		if len(ns) > 0 {
+			nodes = append(nodes, ns)
 		}
 	}
 
-	return buf.String()
+	x := hashWidth
+	y := leafGap
+	height := len(nodes)
+	spaces := make([][]int, height)
+	for i := height - 1; i >= 0; i-- {
+		for j := 0; j < len(nodes[i]); j++ {
+			if nodes[i][j].Left == nil && nodes[i][j].Right == nil {
+				if i == height-1 && j == 0 {
+					spaces[i] = append(spaces[i], 0)
+				} else {
+					spaces[i] = append(spaces[i], spaces[i][j-1]+x+y)
+				}
+			} else {
+				spaces[i] = append(spaces[i], (spaces[i+1][2*j]+spaces[i+1][2*j+1])/2)
+			}
+		}
+	}
+
+	var buff bytes.Buffer
+	for i, level := range nodes {
+		for j, node := range level {
+			n := spaces[i][j]
+			if j > 0 {
+				n -= spaces[i][j-1] + x
+			}
+			buff.WriteString(strings.Repeat(" ", n))
+			buff.WriteString(node.Hash[:x])
+		}
+		buff.WriteString("\n")
+
+		if level[0].Left != nil && level[0].Right != nil {
+			lineGap := spaces[i][0] - spaces[i+1][0] - 1
+			nodeGap := (spaces[i+1][1] - spaces[i+1][0] - 2*lineGap) / 2
+			lines := make([]string, lineGap)
+			for i := 0; i < lineGap; i++ {
+				lines[i] = strings.Repeat(" ", lineGap-i-1) + "/" +
+					strings.Repeat(" ", 2*i+nodeGap) + "\\" +
+					strings.Repeat(" ", lineGap-i-1)
+			}
+
+			for m, node := range nodes[i] {
+				if m != 0 && node.Left != nil && node.Right != nil {
+					for n, line := range lines {
+						lines[n] = line + strings.Repeat(" ", spaces[i][m]-spaces[i][m-1]-len(line)) + line
+					}
+				}
+			}
+
+			for _, line := range lines {
+				buff.WriteString(strings.Repeat(" ", spaces[i+1][0]+x/2+1) + line + "\n")
+			}
+		}
+	}
+	return buff.String()
 }
