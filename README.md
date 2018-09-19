@@ -13,7 +13,7 @@ Fist, use `go get` to install the latest version of the library:
 go get -u github.com/lynn9388/merkletree
 ```
 
-Next, include SupSub in your application:
+Next, include this package in your application:
 
 ```go
 import "github.com/lynn9388/merkletree"
@@ -21,35 +21,40 @@ import "github.com/lynn9388/merkletree"
 
 ## Example
 
-1. Create a new Merkle tree (The data type could be changed to any implementation of `Data`)
+1. Create a new Merkle tree and print it with [PrettyString](https://godoc.org/github.com/lynn9388/merkletree#MerkleTree.PrettyString):
 
     ```go
-    tests := []Data{StringData("lynn"), StringData("9388"), StringData("lynn9388")}
+    tests := [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388"), []byte("com")}
     mt := NewMerkleTree(tests...)
+    fmt.Print(mt.PrettyString(5, 2))
     ```
 
-    The code above will create a new Merkle tree like this:
+    Output:
 
     ```text
-                e46...538
-                   / \
-                  /   \
-                 /     \
-                /       \
-               /         \
-          a02...74d   e20...0a4
-             / \
-            /   \
-           /     \
-          /       \
-         /         \
-    150...cea   6d8...df4
+                 fda22
+                   /\
+                  /  \
+                 /    \
+              fdc64  71b4f
+                /\
+               /  \
+              /    \
+             /      \
+            /        \
+           /          \
+          /            \
+       eea86         a02c4
+         /\            /\
+        /  \          /  \
+       /    \        /    \
+    e0603  7c2ec  1502f  6d86b
     ```
 
-1. Verify the data
+2. Verify the hash of data is in the Merkle tree with [GetProof](https://godoc.org/github.com/lynn9388/merkletree#MerkleTree.GetProof) and [VerifyProof](https://godoc.org/github.com/lynn9388/merkletree#VerifyProof):
 
     ```go
-    proof, err := mt.GetVerifyProof(tests[2])
+    proof, err := mt.GetProof(tests[2])
     if err != nill {
        log.Error(err)
     }
