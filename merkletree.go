@@ -48,8 +48,8 @@ type MerkleTree struct {
 
 // Proof is a item in data's proof path.
 type Proof struct {
-	hash  string
-	order int
+	Hash  string
+	Order int
 }
 
 // hash returns the hash value in hexadecimal of the data.
@@ -134,9 +134,9 @@ func (mt *MerkleTree) GetProof(data []byte) ([]Proof, error) {
 
 	for node.Hash != mt.Root.Hash {
 		if node.Parent.Left == node {
-			ps = append(ps, Proof{hash: node.Parent.Right.Hash, order: right})
+			ps = append(ps, Proof{Hash: node.Parent.Right.Hash, Order: right})
 		} else {
-			ps = append(ps, Proof{hash: node.Parent.Left.Hash, order: left})
+			ps = append(ps, Proof{Hash: node.Parent.Left.Hash, Order: left})
 		}
 
 		node = node.Parent
@@ -150,10 +150,10 @@ func VerifyProof(data []byte, ps []Proof, root string) bool {
 	h := hash(data)
 
 	for _, p := range ps {
-		if p.order == left {
-			h = hash([]byte(p.hash + h))
-		} else if p.order == right {
-			h = hash([]byte(h + p.hash))
+		if p.Order == left {
+			h = hash([]byte(p.Hash + h))
+		} else if p.Order == right {
+			h = hash([]byte(h + p.Hash))
 		}
 	}
 
