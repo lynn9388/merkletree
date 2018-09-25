@@ -17,6 +17,8 @@
 package merkletree
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -24,7 +26,15 @@ var tests = [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388
 
 func TestNewMerkleTree(t *testing.T) {
 	mt := NewMerkleTree(tests...)
-	t.Log("\n" + mt.PrettyString(5, 1))
+	prettyTree := mt.PrettyString(6, 2)
+	fmt.Println("Merkle Tree:\n" + prettyTree)
+
+	proofs, _ := mt.GetProof(tests[3])
+	for i, proof := range proofs {
+		hash := proof.Hash[:5]
+		prettyTree = strings.Replace(prettyTree, hash, fmt.Sprintf("%v-%v", i, hash), 1)
+	}
+	fmt.Println("Proof Path:\n" + prettyTree)
 }
 
 func TestMerkleTree_GetProof(t *testing.T) {

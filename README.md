@@ -25,26 +25,57 @@ import "github.com/lynn9388/merkletree"
 
     ```go
     tests := [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388"), []byte("com")}
-    mt := NewMerkleTree(tests...)
-    fmt.Print(mt.PrettyString(5, 1))
+	mt := NewMerkleTree(tests...)
+	prettyTree := mt.PrettyString(6, 2)
+	fmt.Println("Merkle Tree:\n" + prettyTree)
+
+	proofs, _ := mt.GetProof(tests[3])
+	for i, proof := range proofs {
+		hash := proof.Hash[:5]
+		prettyTree = strings.Replace(prettyTree, hash, fmt.Sprintf("%v-%v", i, hash), 1)
+	}
+	fmt.Println("Proof Path:\n" + prettyTree)
     ```
 
     Output:
 
     ```text
-                fda22
-                 / \
-                /   \
-             fdc64 71b4f
-              / \
-             /   \
-            /     \
-           /       \
-          /         \
-       eea86       a02c4
-        / \         / \
-       /   \       /   \
-    e0603 7c2ec 1502f 6d86b
+    Merkle Tree:
+                    fda22a
+                      / \
+                     /   \
+                    /     \
+                fdc64a  71b4f3
+                  / \
+                 /   \
+                /     \
+               /       \
+              /         \
+             /           \
+            /             \
+        eea865          a02c46
+          / \             / \
+         /   \           /   \
+        /     \         /     \
+    e0603c  7c2ecd  1502fe  6d86b7
+    Proof Path:
+                    fda22a
+                      / \
+                     /   \
+                    /     \
+                fdc64a  2-71b4f3
+                  / \
+                 /   \
+                /     \
+               /       \
+              /         \
+             /           \
+            /             \
+        1-eea865          a02c46
+          / \             / \
+         /   \           /   \
+        /     \         /     \
+    e0603c  7c2ecd  0-1502fe  6d86b7
     ```
 
 2. Verify the hash of data is in the Merkle tree with [GetProof](https://godoc.org/github.com/lynn9388/merkletree#MerkleTree.GetProof) and [VerifyProof](https://godoc.org/github.com/lynn9388/merkletree#VerifyProof):
