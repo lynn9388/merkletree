@@ -145,7 +145,8 @@ func (mt *MerkleTree) GetProof(data []byte) ([]Proof, error) {
 	return ps, nil
 }
 
-// VerifyProof verifies if a proof is valid.
+// VerifyProof verifies if a proof is valid (the data's hash is a leaf of
+// the Merkle tree).
 func VerifyProof(data []byte, ps []Proof, root string) bool {
 	h := hash(data)
 
@@ -160,10 +161,9 @@ func VerifyProof(data []byte, ps []Proof, root string) bool {
 	return h == root
 }
 
-// PrettyString returns a format string to present the Merkle tree.
-// hashWidth is the leading number of hash, leafGap is the gap between
-// leaves.
-func (mt *MerkleTree) PrettyString(hashWidth int, leafGap int) string {
+// PrettyString returns a format string to present the Merkle tree. width
+// is the leading number of hash, gap is the gap between leaves.
+func (mt *MerkleTree) PrettyString(width int, gap int) string {
 	nodes := [][]*MerkleNode{{mt.Root}}
 
 	for i := 0; i < len(nodes); i++ {
@@ -182,8 +182,8 @@ func (mt *MerkleTree) PrettyString(hashWidth int, leafGap int) string {
 		}
 	}
 
-	x := hashWidth
-	y := leafGap
+	x := width
+	y := gap
 	height := len(nodes)
 	spaces := make([][]int, height)
 	for i := height - 1; i >= 0; i-- {
