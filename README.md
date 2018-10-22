@@ -1,6 +1,7 @@
 # Merkle Tree
 
 [![GoDoc](https://godoc.org/github.com/lynn9388/merkletree?status.svg)](https://godoc.org/github.com/lynn9388/merkletree)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lynn9388/merkletree)](https://goreportcard.com/report/github.com/lynn9388/merkletree)
 [![Build Status](https://travis-ci.com/lynn9388/merkletree.svg?branch=master)](https://travis-ci.com/lynn9388/merkletree)
 
 A simple Merkle tree implementation.
