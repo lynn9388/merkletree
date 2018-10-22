@@ -23,9 +23,8 @@ import (
 	"testing"
 )
 
-var tests = [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388"), []byte("com")}
-
 func ExampleNewMerkleTree() {
+	tests := [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388"), []byte("com")}
 	mt := NewMerkleTree(tests...)
 
 	fmt.Println("Merkle Tree:\n" + mt.PrettyString(6, 2))
@@ -51,6 +50,7 @@ func ExampleNewMerkleTree() {
 }
 
 func ExampleMerkleTree_GetProof() {
+	tests := [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388"), []byte("com")}
 	mt := NewMerkleTree(tests...)
 	proof, _ := mt.GetProof(tests[3])
 
@@ -82,6 +82,7 @@ func ExampleMerkleTree_GetProof() {
 }
 
 func TestVerifyProof(t *testing.T) {
+	tests := [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388"), []byte("com")}
 	mt := NewMerkleTree(tests[2])
 	proof, err := mt.GetProof(tests[0])
 	if err == nil || proof != nil || VerifyProof(tests[0], proof, mt.Root.Hash) == true {
