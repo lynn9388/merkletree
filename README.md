@@ -19,73 +19,72 @@ Next, include this package in your application:
 import "github.com/lynn9388/merkletree"
 ```
 
-## Example
+## Usage
 
 1. Create a new Merkle tree and print it with [PrettyString](https://godoc.org/github.com/lynn9388/merkletree#MerkleTree.PrettyString):
 
     ```go
     tests := [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388"), []byte("com")}
-	mt := NewMerkleTree(tests...)
-	prettyTree := mt.PrettyString(6, 2)
-	fmt.Println("Merkle Tree:\n" + prettyTree)
+    mt := NewMerkleTree(tests...)
 
-	proofs, _ := mt.GetProof(tests[3])
-	for i, proof := range proofs {
-		hash := proof.Hash[:5]
-		prettyTree = strings.Replace(prettyTree, hash, fmt.Sprintf("%v-%v", i, hash), 1)
-	}
-	fmt.Println("Proof Path:\n" + prettyTree)
+    fmt.Println("Merkle Tree:\n" + mt.PrettyString(6, 2))
+    // Output:
+    // Merkle Tree:
+    //                 cf5744
+    //                   / \
+    //                  /   \
+    //                 /     \
+    //             1b5c1e  71b4f3
+    //               / \
+    //              /   \
+    //             /     \
+    //            /       \
+    //           /         \
+    //          /           \
+    //         /             \
+    //     4b2099          19ec96
+    //       / \             / \
+    //      /   \           /   \
+    //     /     \         /     \
+    // e0603c  7c2ecd  1502fe  6d86b7
     ```
 
-    Output:
-
-    ```text
-    Merkle Tree:
-                    fda22a
-                      / \
-                     /   \
-                    /     \
-                fdc64a  71b4f3
-                  / \
-                 /   \
-                /     \
-               /       \
-              /         \
-             /           \
-            /             \
-        eea865          a02c46
-          / \             / \
-         /   \           /   \
-        /     \         /     \
-    e0603c  7c2ecd  1502fe  6d86b7
-    Proof Path:
-                    fda22a
-                      / \
-                     /   \
-                    /     \
-                fdc64a  2-71b4f3
-                  / \
-                 /   \
-                /     \
-               /       \
-              /         \
-             /           \
-            /             \
-        1-eea865          a02c46
-          / \             / \
-         /   \           /   \
-        /     \         /     \
-    e0603c  7c2ecd  0-1502fe  6d86b7
-    ```
-
-2. Verify the hash of data is in the Merkle tree with [GetProof](https://godoc.org/github.com/lynn9388/merkletree#MerkleTree.GetProof) and [VerifyProof](https://godoc.org/github.com/lynn9388/merkletree#VerifyProof):
+1. Get a proof of hash of data is in the Merkle tree with [GetProof](https://godoc.org/github.com/lynn9388/merkletree#MerkleTree.GetProof):
 
     ```go
-    proof, err := mt.GetProof(tests[2])
-    if err != nill {
-       log.Error(err)
+    proof, _ := mt.GetProof(tests[3])
+
+    prettyTree := mt.PrettyString(6, 2)
+    for i, p := range proof {
+        hash := hex.EncodeToString(p.Hash)[:6]
+        prettyTree = strings.Replace(prettyTree, hash, fmt.Sprintf("%v-%v", i, hash[:4]), 1)
     }
+    fmt.Println("Proof Path:\n" + prettyTree)
+    // Output:
+    // Proof Path:
+    //                 cf5744
+    //                   / \
+    //                  /   \
+    //                 /     \
+    //             1b5c1e  2-71b4
+    //               / \
+    //              /   \
+    //             /     \
+    //            /       \
+    //           /         \
+    //          /           \
+    //         /             \
+    //     1-4b20          19ec96
+    //       / \             / \
+    //      /   \           /   \
+    //     /     \         /     \
+    // e0603c  7c2ecd  0-1502  6d86b7
+    ```
+
+1. Verify the proofs with [VerifyProof](https://godoc.org/github.com/lynn9388/merkletree#VerifyProof):
+
+    ```go
     if VerifyProof(tests[2], proof, mt.Root.Hash) == false {
-        log.Error("failed to verify")
+        fmt.Println("failed to verify")
     }
     ```

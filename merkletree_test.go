@@ -27,6 +27,7 @@ var tests = [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388
 
 func ExampleNewMerkleTree() {
 	mt := NewMerkleTree(tests...)
+
 	fmt.Println("Merkle Tree:\n" + mt.PrettyString(6, 2))
 	// Output:
 	// Merkle Tree:
@@ -51,11 +52,11 @@ func ExampleNewMerkleTree() {
 
 func ExampleMerkleTree_GetProof() {
 	mt := NewMerkleTree(tests...)
-	proofs, _ := mt.GetProof(tests[3])
+	proof, _ := mt.GetProof(tests[3])
 
 	prettyTree := mt.PrettyString(6, 2)
-	for i, proof := range proofs {
-		hash := hex.EncodeToString(proof.Hash)[:6]
+	for i, p := range proof {
+		hash := hex.EncodeToString(p.Hash)[:6]
 		prettyTree = strings.Replace(prettyTree, hash, fmt.Sprintf("%v-%v", i, hash[:4]), 1)
 	}
 	fmt.Println("Proof Path:\n" + prettyTree)
