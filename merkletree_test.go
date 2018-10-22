@@ -17,6 +17,7 @@
 package merkletree
 
 import (
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"testing"
@@ -24,20 +25,62 @@ import (
 
 var tests = [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388"), []byte("com")}
 
-func TestNewMerkleTree(t *testing.T) {
+func ExampleNewMerkleTree() {
 	mt := NewMerkleTree(tests...)
-	prettyTree := mt.PrettyString(6, 2)
-	fmt.Println("Merkle Tree:\n" + prettyTree)
-
-	proofs, _ := mt.GetProof(tests[3])
-	for i, proof := range proofs {
-		hash := proof.Hash[:5]
-		prettyTree = strings.Replace(prettyTree, hash, fmt.Sprintf("%v-%v", i, hash), 1)
-	}
-	fmt.Println("Proof Path:\n" + prettyTree)
+	fmt.Println("Merkle Tree:\n" + mt.PrettyString(6, 2))
+	// Output:
+	// Merkle Tree:
+	//                 cf5744
+	//                   / \
+	//                  /   \
+	//                 /     \
+	//             1b5c1e  71b4f3
+	//               / \
+	//              /   \
+	//             /     \
+	//            /       \
+	//           /         \
+	//          /           \
+	//         /             \
+	//     4b2099          19ec96
+	//       / \             / \
+	//      /   \           /   \
+	//     /     \         /     \
+	// e0603c  7c2ecd  1502fe  6d86b7
 }
 
-func TestMerkleTree_GetProof(t *testing.T) {
+func ExampleMerkleTree_GetProof() {
+	mt := NewMerkleTree(tests...)
+	proofs, _ := mt.GetProof(tests[3])
+
+	prettyTree := mt.PrettyString(6, 2)
+	for i, proof := range proofs {
+		hash := hex.EncodeToString(proof.Hash)[:6]
+		prettyTree = strings.Replace(prettyTree, hash, fmt.Sprintf("%v-%v", i, hash[:4]), 1)
+	}
+	fmt.Println("Proof Path:\n" + prettyTree)
+	// Output:
+	// Proof Path:
+	//                 cf5744
+	//                   / \
+	//                  /   \
+	//                 /     \
+	//             1b5c1e  2-71b4
+	//               / \
+	//              /   \
+	//             /     \
+	//            /       \
+	//           /         \
+	//          /           \
+	//         /             \
+	//     1-4b20          19ec96
+	//       / \             / \
+	//      /   \           /   \
+	//     /     \         /     \
+	// e0603c  7c2ecd  0-1502  6d86b7
+}
+
+func TestVerifyProof(t *testing.T) {
 	mt := NewMerkleTree(tests[2])
 	proof, err := mt.GetProof(tests[0])
 	if err == nil || proof != nil || VerifyProof(tests[0], proof, mt.Root.Hash) == true {
