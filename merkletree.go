@@ -139,9 +139,9 @@ func (mt *MerkleTree) GetProof(data []byte) ([]Proof, error) {
 	return ps, nil
 }
 
-// VerifyProof verifies if a proof is valid (the data's hash is a leaf of
+// IsProofValid checks if a proof is valid (the data's hash is a leaf of
 // the Merkle tree).
-func VerifyProof(data []byte, ps []Proof, root []byte) bool {
+func IsProofValid(data []byte, ps []Proof, root []byte) bool {
 	var hash [32]byte
 	hash = sha256.Sum256(data)
 

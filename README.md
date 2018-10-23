@@ -82,10 +82,10 @@ import "github.com/lynn9388/merkletree"
     // e0603c  7c2ecd  0-1502  6d86b7
     ```
 
-1. Verify the proofs with [VerifyProof](https://godoc.org/github.com/lynn9388/merkletree#VerifyProof):
+1. Verify the proofs with [IsProofValid](https://godoc.org/github.com/lynn9388/merkletree#IsProofValid):
 
     ```go
-    if VerifyProof(tests[2], proof, mt.Root.Hash) == false {
+    if IsProofValid(tests[2], proof, mt.Root.Hash) == false {
         fmt.Println("failed to verify")
     }
     ```
