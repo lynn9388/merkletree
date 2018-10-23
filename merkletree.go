@@ -73,7 +73,8 @@ func newMerkleNode(left *MerkleNode, right *MerkleNode, data []byte) *MerkleNode
 	return &node
 }
 
-// NewMerkleTree builds a new Merkle tree using the data.
+// NewMerkleTree builds a new Merkle tree using the data. If the date is
+// empty then will return nil.
 func NewMerkleTree(data ...[]byte) *MerkleTree {
 	var nodes []*MerkleNode
 
@@ -81,7 +82,7 @@ func NewMerkleTree(data ...[]byte) *MerkleTree {
 		nodes = append(nodes, newMerkleNode(nil, nil, datum))
 	}
 
-	for len(nodes) != 1 {
+	for len(nodes) > 1 {
 		var parents []*MerkleNode
 
 		for i := 0; i+1 < len(nodes); i += 2 {
@@ -96,10 +97,14 @@ func NewMerkleTree(data ...[]byte) *MerkleTree {
 		nodes = parents
 	}
 
-	return &MerkleTree{Root: nodes[0]}
+	if len(nodes) == 1 {
+		return &MerkleTree{Root: nodes[0]}
+	}
+	return nil
 }
 
-// findNode finds the leaf node with the same hash value.
+// findNode finds the leaf node with the same hash value. If not find then
+// will return nil.
 func (mn *MerkleNode) findNode(hash [32]byte) *MerkleNode {
 	if mn == nil {
 		return nil

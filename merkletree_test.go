@@ -23,6 +23,13 @@ import (
 	"testing"
 )
 
+func TestNewMerkleTree(t *testing.T) {
+	mt := NewMerkleTree([][]byte{}...)
+	if mt != nil {
+		t.FailNow()
+	}
+}
+
 func ExampleNewMerkleTree() {
 	tests := [][]byte{[]byte("http"), []byte("www"), []byte("lynn"), []byte("9388"), []byte("com")}
 	mt := NewMerkleTree(tests...)
