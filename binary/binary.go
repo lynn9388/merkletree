@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-// Package binary implements a binary Merkle Hash Tree.
+// Package binary implements a binary Merkle hash tree.
 package binary
 
 import (
@@ -39,7 +39,7 @@ type MerkleTree struct {
 	Hash   []byte
 }
 
-// AuditPath is the shortest list of additional nodes in the Merkle Tree
+// AuditPath is the shortest list of additional nodes in the Merkle tree
 // required to compute the root hash for that tree.
 type AuditPath struct {
 	Path  [][]byte
@@ -55,7 +55,7 @@ func hashString(hash []byte) string {
 	return hex.EncodeToString(hash)
 }
 
-// New builds a new Merkle Hash Tree using the data. If the date is empty
+// New builds a new Merkle hash tree using the data. If the date is empty
 // then the hash value of the root node is the hash of an empty string.
 func New(data ...[]byte) *MerkleTree {
 	n := len(data)
@@ -129,7 +129,7 @@ func (mt *MerkleTree) GetAuditPath(data []byte) (*AuditPath, error) {
 }
 
 // IsValid checks if an audit path is valid (the data's hash is a leaf of
-// the Merkle Hash Tree).
+// the Merkle hash tree).
 func (ap *AuditPath) IsValid(data []byte, rootHash []byte) bool {
 	if ap == nil {
 		return false
@@ -146,7 +146,7 @@ func (ap *AuditPath) IsValid(data []byte, rootHash []byte) bool {
 	return bytes.Equal(rootHash, h)
 }
 
-// Pretty returns a format string slice for Merkle Hash Tree as ASCII text.
+// Pretty returns a format string slice for Merkle hash tree as ASCII text.
 // nodeWidth is the leading number of hash value.
 func (mt *MerkleTree) Pretty(nodeWidth int) []string {
 	if mt == nil || nodeWidth < 1 {
@@ -170,7 +170,7 @@ func (mt *MerkleTree) Pretty(nodeWidth int) []string {
 	 *  branches = {1,3,7,15...} {2,4,9,19...} {2,5,11,23...} {3,6,13,27...}
 	 */
 	offset := int(math.Ceil(float64(nodeWidth) / 2))
-	branches := make([]int, leftBranchNum) // branch lengths of the tree at different heights
+	branches := make([]int, leftBranchNum) // branch lengths at different heights
 	length := nodeWidth/2 + 1
 	for i := range branches {
 		if i == 0 {
@@ -244,7 +244,6 @@ func (mt *MerkleTree) Pretty(nodeWidth int) []string {
 		for childRoot := mt.Right; childRoot.Left != nil; childRoot = childRoot.Left {
 			rightBranchNum++
 		}
-
 		length := branches[rightBranchNum]
 
 		/*
@@ -299,7 +298,7 @@ func (mt *MerkleTree) Pretty(nodeWidth int) []string {
 	return canvasStrinng
 }
 
-// PrettyString returns a format string for Merkle Hash Tree as ASCII text.
+// PrettyString returns a format string for Merkle hash tree as ASCII text.
 // nodeWidth is the leading number of hash value.
 func (mt *MerkleTree) PrettyString(nodeWidth int) string {
 	return strings.Join(mt.Pretty(nodeWidth), "\n")
